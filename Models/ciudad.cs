@@ -4,6 +4,7 @@ namespace APIPractica.Models
 {
     public class ciudad
     {
+        public ciudad() { }
         [Key]
         public int id_ciudad { get; set; }
         [Required]

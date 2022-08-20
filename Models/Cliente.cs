@@ -1,11 +1,13 @@
 ﻿using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
 
 namespace APIPractica.Models
 {
     public class Cliente
     {
         [Key]
-        public int? IdCliente { get; set; }
+        public int IdCliente { get; set; }
+        
         [Required]
         public string? cedula{ get; set; }
         [Required]
@@ -17,8 +19,8 @@ namespace APIPractica.Models
         [Required]
         public int? edad { get; set; }
         [Required]
-        public int? idCiudad { get; set; }
-        //[Required]
-        //public string? nombreCiudad { get; set; }
+        public int idCiudad { get; set; }
+       
     }
+    
 }

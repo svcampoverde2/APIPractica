@@ -7,7 +7,6 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using APIPractica.Data;
 using APIPractica.Models;
-using static Microsoft.EntityFrameworkCore.DbLoggerCategory;
 
 namespace APIPractica.Controllers
 {
@@ -21,47 +20,74 @@ namespace APIPractica.Controllers
         {
             _context = context;
         }
+        [HttpGet("{desde}&{hasta}/clientebyedad")]
+        public async Task<ActionResult<IEnumerable<Cliente>>> GetCliente(int desde, int hasta)
+        {
+            if (_context.cliente == null)
+            {
+                return NotFound();
+            }
+            return await _context.cliente.Where(c => c.edad >= desde && c.edad <= hasta).ToListAsync();
+        }
+
+        [HttpGet("{apellido}/clientebyapellido")]
+        public async Task<ActionResult<IEnumerable<Cliente>>> GetCliente(string apellido)
+        {
+            IQueryable<Cliente> query = _context.cliente;
+            query = query.Where(e => e.apellidos.StartsWith(apellido));
+            
+            if (query == null)
+            {
+                return null;
+            }
+            return await query.ToListAsync();
+        }
+        [HttpGet("/busquedaporCiudad")]
+        public object GetClienteByCiudad(string ciudad)
+        {
+            if (_context.cliente == null)
+            {
+                return NotFound();
+            }
+            var datos = (from e in _context.cliente  join c in _context.ciudad on e.idCiudad equals c.id_ciudad
+                             where(c.nombreCiudad == ciudad) select new
+                             {
+                               cedula=   e.cedula,
+                                nombres= e.nombres,
+                               apellidos=  e.apellidos,
+                               direccion = e.direccion,
+                               edad =  e.edad,
+                               nombreCiudad = c.nombreCiudad
+                             }).ToList();
+            return datos;
+        }
 
         [HttpGet("{cedula}/clientebycedula")]
         public async Task<ActionResult<IEnumerable<Cliente>>> Search(string cedula)
         {
             IQueryable<Cliente> query = _context.cliente;
-            query = query.Where(e => e.cedula.StartsWith(cedula) && e.edad>=30 && e.edad <= 50);
-            // query = query.Where(e => e.edad.HasValue(edad).ToString());
-            //(query.Where((e => e.edad >= 39) || (e => e.edad <= 50)
-            if (query != null)
+            query = query.Where(e => e.cedula.StartsWith(cedula));
+            if (query == null)
             {
-                
+                return null;
             }
             return await query.ToListAsync();
         }
-     
-
-        //[HttpGet("{cedula}/clientebycedula")]
-        //public async Task<ActionResult<IEnumerable<Cliente>>> Search(string cedula)
-        //{
-        //    IQueryable<Cliente> query = _context.cliente;
-        //    query = query.Where(e => e.cedula.StartsWith(cedula));
-        //    if (query == null)
-        //    {
-        //        return null;
-        //    }
-        //    return await query.ToListAsync();
-        //}
         // GET: api/Clientes
         [HttpGet]
         public async Task<ActionResult<IEnumerable<Cliente>>> GetCliente()
         {
-          if (_context.cliente == null)
-          {
-              return NotFound();
-          }
+            if (_context.cliente == null)
+            {
+                return NotFound();
+            }
+
             return await _context.cliente.ToListAsync();
         }
 
         // GET: api/Clientes/5
         [HttpGet("{id}")]
-        public async Task<ActionResult<Cliente>> GetCliente(int? id)
+        public async Task<ActionResult<Cliente>> GetCliente(int id)
         {
           if (_context.cliente == null)
           {
@@ -80,7 +106,7 @@ namespace APIPractica.Controllers
         // PUT: api/Clientes/5
         // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
         [HttpPut("{id}")]
-        public async Task<IActionResult> PutCliente(int? id, Cliente cliente)
+        public async Task<IActionResult> PutCliente(int id, Cliente cliente)
         {
             if (id != cliente.IdCliente)
             {

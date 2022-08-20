@@ -9,8 +9,8 @@ namespace APIPractica.Data
      { 
      
      }
-        public DbSet<Cliente> cliente { get; set; }
-        //public DbSet<Ciudad> ciudad { get; set; }
+        public DbSet<ciudad> ciudad { get; set; }
+        public  DbSet<Cliente> cliente { get; set; }
     }
 }
 
